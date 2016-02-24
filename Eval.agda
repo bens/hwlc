@@ -2,13 +2,14 @@ module Eval where
 
 open import Coinduction
 open import Data.Bool
-open import Data.Fin
+open import Data.Fin     using (Fin)
+import      Data.Fin     as F
 open import Data.Product using (Σ; _,_)
 import      Data.Product as P
-open import Data.Stream using (Stream; _∷_)
-import      Data.Stream as S
-open import Data.Vec    using (Vec; []; _∷_)
-import      Data.Vec    as V
+open import Data.Stream  using (Stream; _∷_)
+import      Data.Stream  as S
+open import Data.Vec     using (Vec; []; _∷_)
+import      Data.Vec     as V
 open import Relation.Binary.PropositionalEquality
 
 open import Types
@@ -25,11 +26,11 @@ data Env : ∀ {n} → Ctx n → Set where
   _∷_ : ∀ {n} {Γ : Ctx n} {τ} → ⟦ τ ⟧ᵗ → Env Γ → Env (τ ∷ Γ)
 
 lookupEnv : ∀ {n} {Γ : Ctx n} (i : Fin n) → Env Γ → ⟦ V.lookup i Γ ⟧ᵗ
-lookupEnv zero (x ∷ env) = x
-lookupEnv (suc i) (x ∷ env) = lookupEnv i env
+lookupEnv F.zero (x ∷ env) = x
+lookupEnv (F.suc i) (x ∷ env) = lookupEnv i env
 
 private
-  runReg : ∀ {σ τ} → (⟦ τ ⟧ᵗ → P._×_ ⟦ τ ⟧ᵗ ⟦ σ ⟧ᵗ) → ⟦ τ ⟧ᵗ → Stream ⟦ σ ⟧ᵗ
+  runReg : ∀ {σ τ} → (⟦ τ ⟧ᵗ → ⟦ τ ⟧ᵗ P.× ⟦ σ ⟧ᵗ) → ⟦ τ ⟧ᵗ → Stream ⟦ σ ⟧ᵗ
   runReg f s with f s
   runReg f s | s′ , x = x ∷ ♯ (runReg f s′)
 

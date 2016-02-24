@@ -2,17 +2,17 @@ module Operations.Combinatorial where
 
 open import Data.Bool using (true; false)
 import      Data.Bool as B
-import      Data.Fin as Fin
-open import Data.Nat
-open import Data.Vec using ([]; _∷_)
-import      Data.Vec as V
+import      Data.Fin  as F
+open import Data.Nat  using (ℕ; suc)
+open import Data.Vec  using ([]; _∷_)
+import      Data.Vec  as V
 open import Relation.Binary.PropositionalEquality
 
 open import Types
 open import Eval
 
 not : Closed (𝔹 ⇒ 𝔹)
-not = lam (var Fin.zero refl nand var Fin.zero refl)
+not = lam (var F.zero refl nand var F.zero refl)
 
 not-prf : ∀ {n} {ctx : Ctx n} {Γ : Env ctx} b → (Γ ⟦ not ⟧) b ≡ B.not b
 not-prf true = refl
@@ -20,7 +20,7 @@ not-prf false = refl
 
 not⁺ : ∀ n → Closed (𝔹⁺ n ⇒ 𝔹⁺ n)
 not⁺ 0 = lam []
-not⁺ (suc n) = lam (not ∙ head (var Fin.zero refl) ∷ not⁺ n ∙ tail (var Fin.zero refl))
+not⁺ (suc n) = lam (not ∙ head (var F.zero refl) ∷ not⁺ n ∙ tail (var F.zero refl))
 
 not⁺-prf : ∀ {n m} {ctx : Ctx m} {Γ : Env ctx} bs → (Γ ⟦ not⁺ n ⟧) bs ≡ V.map B.not bs
 not⁺-prf [] = refl
@@ -29,7 +29,7 @@ not⁺-prf (false ∷ bs) = cong₂ _∷_ refl (not⁺-prf bs)
 
 
 and : Closed (𝔹 ⇒ (𝔹 ⇒ 𝔹))
-and = lam (lam (not ∙ ((var (Fin.suc Fin.zero) refl) nand (var Fin.zero refl))))
+and = lam (lam (not ∙ ((var (F.suc F.zero) refl) nand (var F.zero refl))))
 
 and-prf : ∀ a b → ([] ⟦ and ⟧) a b ≡ B._∧_ a b
 and-prf  true  true = refl
@@ -41,8 +41,8 @@ and⁺ : ∀ n → Closed (𝔹⁺ n ⇒ (𝔹⁺ n ⇒ 𝔹⁺ n))
 and⁺ 0 = lam (lam [])
 and⁺ (suc n) = lam (lam (x ∷ xs))
   where
-  x  = and    ∙ head (var (Fin.suc Fin.zero) refl) ∙ head (var Fin.zero refl)
-  xs = and⁺ n ∙ tail (var (Fin.suc Fin.zero) refl) ∙ tail (var Fin.zero refl)
+  x  = and    ∙ head (var (F.suc F.zero) refl) ∙ head (var F.zero refl)
+  xs = and⁺ n ∙ tail (var (F.suc F.zero) refl) ∙ tail (var F.zero refl)
 
 and⁺-prf : ∀ {n m} {ctx : Ctx m} {Γ : Env ctx} as bs → (Γ ⟦ and⁺ n ⟧) as bs ≡ V.zipWith B._∧_ as bs
 and⁺-prf [] [] = refl
@@ -55,8 +55,8 @@ and⁺-prf (false ∷ as) (false ∷ bs) = cong₂ _∷_ refl (and⁺-prf as bs)
 or : Closed (𝔹 ⇒ (𝔹 ⇒ 𝔹))
 or = lam (lam (l nand r))
   where
-  l = ((var (Fin.suc Fin.zero) refl) nand (var (Fin.suc Fin.zero) refl))
-  r = ((var Fin.zero refl) nand (var Fin.zero refl))
+  l = ((var (F.suc F.zero) refl) nand (var (F.suc F.zero) refl))
+  r = ((var F.zero refl) nand (var F.zero refl))
 
 or-prf : ∀ a b → ([] ⟦ or ⟧) a b ≡ B._∨_ a b
 or-prf  true  true = refl
@@ -68,8 +68,8 @@ or⁺ : ∀ n → Closed (𝔹⁺ n ⇒ (𝔹⁺ n ⇒ 𝔹⁺ n))
 or⁺ 0 = lam (lam [])
 or⁺ (suc n) = lam (lam (x ∷ xs))
   where
-  x  = or    ∙ head (var (Fin.suc Fin.zero) refl) ∙ head (var Fin.zero refl)
-  xs = or⁺ n ∙ tail (var (Fin.suc Fin.zero) refl) ∙ tail (var Fin.zero refl)
+  x  = or    ∙ head (var (F.suc F.zero) refl) ∙ head (var F.zero refl)
+  xs = or⁺ n ∙ tail (var (F.suc F.zero) refl) ∙ tail (var F.zero refl)
 
 or⁺-prf : ∀ {n m} {ctx : Ctx m} {Γ : Env ctx} as bs → (Γ ⟦ or⁺ n ⟧) as bs ≡ V.zipWith B._∨_ as bs
 or⁺-prf [] [] = refl
@@ -82,9 +82,9 @@ or⁺-prf (false ∷ as) (false ∷ bs) = cong₂ _∷_ refl (or⁺-prf as bs)
 xor : Closed (𝔹 ⇒ (𝔹 ⇒ 𝔹))
 xor = lam (lam (lam (l nand r) ∙ x))
   where
-  x = (var (Fin.suc Fin.zero) refl) nand (var Fin.zero refl)
-  l = ((var (Fin.suc (Fin.suc Fin.zero)) refl) nand (var Fin.zero refl))
-  r = ((var Fin.zero refl) nand (var (Fin.suc Fin.zero) refl))
+  x = (var (F.suc F.zero) refl) nand (var F.zero refl)
+  l = ((var (F.suc (F.suc F.zero)) refl) nand (var F.zero refl))
+  r = ((var F.zero refl) nand (var (F.suc F.zero) refl))
 
 xor-prf : ∀ a b → ([] ⟦ xor ⟧) a b ≡ B._xor_ a b
 xor-prf  true  true = refl
@@ -96,8 +96,8 @@ xor⁺ : ∀ n → Closed (𝔹⁺ n ⇒ (𝔹⁺ n ⇒ 𝔹⁺ n))
 xor⁺ 0 = lam (lam [])
 xor⁺ (suc n) = lam (lam (x ∷ xs))
   where
-  x  = xor    ∙ head (var (Fin.suc Fin.zero) refl) ∙ head (var Fin.zero refl)
-  xs = xor⁺ n ∙ tail (var (Fin.suc Fin.zero) refl) ∙ tail (var Fin.zero refl)
+  x  = xor    ∙ head (var (F.suc F.zero) refl) ∙ head (var F.zero refl)
+  xs = xor⁺ n ∙ tail (var (F.suc F.zero) refl) ∙ tail (var F.zero refl)
 
 xor⁺-prf : ∀ {n m} {ctx : Ctx m} {Γ : Env ctx} as bs → (Γ ⟦ xor⁺ n ⟧) as bs ≡ V.zipWith B._xor_ as bs
 xor⁺-prf [] [] = refl

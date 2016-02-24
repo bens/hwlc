@@ -2,7 +2,7 @@ module Types where
 
 open import Data.Bool
 open import Data.Fin using (Fin)
-import      Data.Fin as Fin
+import      Data.Fin as F
 open import Data.Nat renaming (_≟_ to _≟N_)
 open import Data.Vec hiding (head; tail)
 open import Relation.Binary.PropositionalEquality
@@ -119,6 +119,6 @@ erase (pair x y)  = pair (erase x) (erase y)
 erase (latest x)  = latest (erase x)
 erase (head x)    = head (erase x)
 erase (tail x)    = tail (erase x)
-erase (var v _)   = var (Fin.toℕ v)
+erase (var v _)   = var (F.toℕ v)
 erase (t ∙ u)     = erase t ∙ erase u
 erase (lam {σ} t) = lam σ (erase t)
